@@ -123,10 +123,7 @@ bool handleCommand(string input)
         exit(-1);
     }
 
-    if(wait(NULL) == -1)
-    {
-        perror("wait");
-    }
+    wait(NULL);
 
     return true;
 }
