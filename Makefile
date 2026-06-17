@@ -4,7 +4,7 @@
 # ###########################################################
 
 EXEC = xsh
-FILES = main.cpp shell.cpp
+FILES = main.cpp shell.cpp pipe.cpp
 CC = g++
 CFLAGS = -c
 
