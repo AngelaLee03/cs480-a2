@@ -95,15 +95,8 @@ bool handleCommand(string input)
         }
         commands.push_back(current);
         
-        executePipeCommand(commands);
+        pipeCommand(commands);
         
-        return true;
-    }
-    
-    // Reject more than one argument for non-pipe commands
-    if(tokens.size() > 2)
-    {
-        cout << "Error: invalid command format." << endl;
         return true;
     }
 
