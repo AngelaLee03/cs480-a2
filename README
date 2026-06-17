@@ -1,0 +1,203 @@
+CS480 Summer 2026
+Programming Assignment #2: Experimental Shell XSH
+
+Filename: README
+
+Name: Angela Lee
+Class Account: cssc3130
+
+Partner Name: Caitlin Corpus
+Partner Class Account: cssc3114
+
+Testing Account: cssc3130
+
+------------------------------------------------------------
+
+FILES INCLUDED:
+
+main.cpp:
+    Contains the main function. The main function acts as a
+    table of contents by displaying the prompt, reading input,
+    and sending commands to be processed.
+
+shell.cpp:
+    Contains the prompt display function and command handling
+    logic. This file parses user input, handles the exit command,
+    validates command format, and starts non-pipe commands.
+
+pipe.cpp:
+    Contains the pipeCommand function. This file creates pipes,
+    forks child processes, redirects input/output using dup2(),
+    closes file descriptors, and waits for child processes.
+
+shell.h:
+    Header file containing function prototypes used by the project.
+
+Makefile:
+    Compiles the project and removes generated files.
+
+README:
+    Description and instructions for the project.
+
+------------------------------------------------------------
+
+COMPILATION:
+
+To compile the project:
+
+make
+
+------------------------------------------------------------
+
+RUNNING THE PROGRAM:
+
+To execute the shell:
+
+./xsh
+
+Once running, XSH displays a prompt using the class account
+username, such as:
+
+cssc3130%
+
+Valid command formats include:
+
+executablefilename
+executablefilename argument
+executablefilename | executablefilename
+executablefilename | executablefilename | executablefilename
+exit
+
+Examples:
+
+ls
+ls -l
+pwd
+ls | sort
+ls | sort | cat
+exit
+
+------------------------------------------------------------
+
+CLEANING FILES:
+
+To remove executable and object files:
+
+make clean
+
+------------------------------------------------------------
+
+PROGRAM DESCRIPTION:
+
+This program implements an experimental shell named XSH.
+
+The shell:
+- Displays a prompt using the USER environment variable
+- Reads one command line from the user at a time
+- Supports the builtin command exit
+- Executes regular commands using fork() and execvp()
+- Supports commands with one argument
+- Rejects invalid command formats
+- Supports pipes between multiple commands
+- Uses pipe(), fork(), dup2(), close(), execvp(), and wait()
+- Returns to the prompt after each command finishes
+- Gracefully exits when the user enters exit
+
+------------------------------------------------------------
+
+DESIGN DECISIONS:
+
+The program was split into multiple source files to keep main()
+small and readable.
+
+main.cpp only controls the main shell loop.
+
+shell.cpp handles user input, parsing, validation, and execution
+of non-pipe commands.
+
+pipe.cpp handles commands connected by pipes. Each command in a
+pipeline is executed in its own child process. Pipes are created
+before forking, and dup2() is used to redirect standard input and
+standard output.
+
+execvp() was used because it searches the PATH environment
+variable for executable names such as ls, pwd, sort, and cat.
+This allows both simple command names and path-based execution.
+
+The USER environment variable is used to display the prompt with
+the class account username.
+
+System call return values are checked using perror() where
+appropriate.
+
+------------------------------------------------------------
+
+WORK DISTRIBUTION:
+
+Angela Lee:
+- Created the initial project structure
+- Wrote main.cpp
+- Worked on command parsing in shell.cpp
+- Implemented prompt display
+- Implemented exit command handling
+- Tested compilation and execution on edoras
+- Helped test valid and invalid command inputs
+
+Caitlin Corpus:
+- Worked on pipe command implementation
+- Added pipe.cpp
+- Added pipe support to the Makefile
+- Helped update shell.cpp to detect and parse pipe commands
+- Added comments and helped test multiple pipe commands
+
+Both partners:
+- Discussed program design
+- Reviewed code
+- Tested fork(), execvp(), pipe(), dup2(), close(), and wait()
+- Verified the project compiles and runs on edoras
+
+------------------------------------------------------------
+
+EXTRA FEATURES:
+
+The program supports multiple pipes on a single command line,
+not only one pipe.
+
+The program also validates pipe syntax and prints an error for
+invalid inputs such as:
+
+ls |
+| sort
+
+------------------------------------------------------------
+
+KNOWN DEFICIENCIES OR BUGS:
+
+No known bugs at this time.
+
+The program supports only the command formats required by the
+assignment. It does not implement shell features such as cd,
+background execution, input/output redirection, environment
+variable editing, or quoted strings.
+
+------------------------------------------------------------
+
+LESSONS LEARNED:
+
+We learned how a shell reads and processes user commands.
+
+We learned how to create child processes using fork().
+
+We learned how execvp() replaces a child process with another
+program.
+
+We learned how pipes allow one process to send output to another
+process.
+
+We learned how dup2() redirects standard input and standard output.
+
+We learned the importance of closing unused file descriptors in
+pipe-based programs.
+
+We learned how to check system call return values and report errors
+using perror().
