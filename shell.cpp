@@ -53,7 +53,7 @@ bool handleCommand(string input)
         cout << "Error: exit does not take arguments." << endl;
         return true;
     }
-    
+
     // Check whether the command line contains a pipe symbol
     bool hasPipe = false;
 
@@ -66,11 +66,12 @@ bool handleCommand(string input)
         }
     }
 
+    // Handle commands that use pipes
     if(hasPipe)
     {
-    vector<vector<string>> commands;
-    vector<string> current;
-        
+        vector<vector<string>> commands;
+        vector<string> current;
+
         for(size_t i = 0; i < tokens.size(); i++)
         {
             if(tokens[i] == "|")
@@ -80,6 +81,7 @@ bool handleCommand(string input)
                     cout << "Error: invalid pipe syntax." << endl;
                     return true;
                 }
+
                 commands.push_back(current);
                 current.clear();
             }
@@ -88,15 +90,23 @@ bool handleCommand(string input)
                 current.push_back(tokens[i]);
             }
         }
+
         if(current.empty())
         {
             cout << "Error: invalid pipe syntax." << endl;
             return true;
         }
+
         commands.push_back(current);
-        
         pipeCommand(commands);
-        
+
+        return true;
+    }
+
+    // Reject more than one argument for non-pipe commands
+    if(tokens.size() > 2)
+    {
+        cout << "Error: invalid command format." << endl;
         return true;
     }
 
@@ -123,7 +133,10 @@ bool handleCommand(string input)
         exit(-1);
     }
 
-    wait(NULL);
+    if(wait(NULL) == -1)
+    {
+        perror("wait");
+    }
 
     return true;
 }

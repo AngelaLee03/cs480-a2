@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
+#include <cstdio>
 #include "shell.h"
 
 using namespace std;
@@ -33,21 +34,42 @@ void pipeCommand(vector<vector<string>> commands)
     {
         pid_t pid = fork();
 
+	if(pid < 0)
+        {
+            perror("fork");
+            return;
+        }
+
         if(pid == 0)
         {
-            // If its not the first command then read from previous pipe
+            // If it is not the first command, then read from previous pipe
             if(i > 0)
-                dup2(pipes[i - 1][0], STDIN_FILENO);
+            {   
+		if(dup2(pipes[i - 1][0], STDIN_FILENO) == -1)
+		{
+		   perror("dup2");
+		   exit(1);
+		}
+	    }
 
-            // If its not the last command then write to the next pipe
+            // If it is not the last command, then write to the next pipe
             if(i < n - 1)
-                dup2(pipes[i][1], STDOUT_FILENO);
+	    {
+                if(dup2(pipes[i][1], STDOUT_FILENO) == -1) 
+	        {
+		   perror("dup2");
+                   exit(1);
+		}
+	    }
 
             // Close pipe file discriptors (all)
             for(int j = 0; j < n - 1; j++)
             {
-                close(pipes[j][0]);
-                close(pipes[j][1]);
+                if(close(pipes[j][0]) == -1)
+		    perror("close");
+
+                if(close(pipes[j][1]) == -1)
+		    perror("close");
             }
 
             vector<char*> args;
@@ -68,11 +90,17 @@ void pipeCommand(vector<vector<string>> commands)
 
     for(int i = 0; i < n - 1; i++)
     {
-        close(pipes[i][0]);
-        close(pipes[i][1]);
+        if(close(pipes[i][0]) == -1)
+	     perror("close");
+
+        if(close(pipes[i][1]) == -1)
+	     perror("close");
     }
 
     // Must wait for all child processes to finish
     for(int i = 0; i < n; i++)
-        wait(NULL);
+    {
+        if(wait(NULL) == -1)
+	     perror("wait");
+    }
 }
