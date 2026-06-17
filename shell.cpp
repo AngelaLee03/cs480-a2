@@ -5,6 +5,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <cstdio>
 #include "shell.h"
 
 using namespace std;
@@ -34,8 +35,8 @@ bool handleCommand(string input)
     while(ss >> token)
     {
         tokens.push_back(token);
-    };
-    
+    }
+
     // Empty input just shows a new prompt
     if(tokens.size() == 0)
         return true;
@@ -64,7 +65,7 @@ bool handleCommand(string input)
 
     if(pid < 0)
     {
-        cout << "Error: fork failed." << endl;
+        perror("fork");
         return true;
     }
 
@@ -79,11 +80,14 @@ bool handleCommand(string input)
 
         execvp(args[0], args.data());
 
-        cout << "Error: unable to execute command." << endl;
+        perror("execvp");
         exit(-1);
     }
 
-    wait(NULL);
+    if(wait(NULL) == -1)
+    {
+        perror("wait");
+    }
 
     return true;
 }
